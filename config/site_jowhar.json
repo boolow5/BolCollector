@@ -1,6 +1,6 @@
 {
   "name": "Jowhar",
-  "root_url": "/home/mahdi/jowhar.html",
+  "root_url": "http://www.jowhar.com",
   "selector": {
     "base": "article",
     "target_base":"h2",
