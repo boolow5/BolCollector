@@ -17,11 +17,10 @@ func main() {
 				log.Fatalln(err)
 			}
 			if err == nil {
-				models.SaveNews(items)
+				go models.SaveNews(items)
 			}
 			fmt.Println("Next update will takeplace after", models.SETTINGS.Delay, "second(s)")
 		}
 		time.Sleep(time.Second * time.Duration(models.SETTINGS.Delay))
 	}
-
 }
