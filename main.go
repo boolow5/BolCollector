@@ -1,52 +1,27 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"strings"
+	"log"
+	"time"
+
+	"github.com/boolow5/BolCollector/models"
 )
-
-func init() {
-	// load and open config files
-	config, err := ioutil.ReadFile("config/config.json")
-	if err != nil {
-		panic(err)
-	}
-
-	// parse the config files
-	settings := Settings{}
-	json.Unmarshal(config, &settings)
-
-	dir := "config"
-
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		panic(err)
-	}
-	websites := []*Website{}
-	for index, file := range files {
-		if strings.HasPrefix(file.Name(), "site") {
-			fmt.Println("Website configuration found", file.Name(), "index", index)
-			fileData, err := ioutil.ReadFile(dir + "/" + file.Name())
-			site := Website{}
-			err = json.Unmarshal(fileData, &site)
-			if err == nil {
-				websites = append(websites, &site)
-			}
-		}
-	}
-	for _, site := range websites {
-		fmt.Println(site.RootUrl)
-		fmt.Println(site.Name)
-		fmt.Println(site.Selector.TargetBase)
-	}
-}
 
 func main() {
 	// start infinite loop to fetch news
+	for {
+		for _, site := range models.WEBSITES {
+			items, err := site.GetNewsItems()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			if err == nil {
+				models.SaveNews(items)
+			}
+			fmt.Println("Next update will takeplace after", models.SETTINGS.Delay, "second(s)")
+		}
+		time.Sleep(time.Second * time.Duration(models.SETTINGS.Delay))
+	}
 
-	// make a call to any site every DELAY_TIME from the settings
-	// use the basic configurations from config.json
-	// with every call use the json sites.json from the file
 }
