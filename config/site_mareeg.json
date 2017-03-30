@@ -1,9 +1,9 @@
 {
   "name": "Mareeg",
-  "root_url": "http://www.mareeg.com",
+  "root_url": "/home/mahdi/mareeg.html",
   "selector": {
-    "base": "article",
-    "target_base":"h2",
+    "base": ".mh-posts-list-item",
+    "target_base":"h3",
     "target_text": "a",
     "target_link": "a"
   }
