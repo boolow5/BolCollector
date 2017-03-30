@@ -28,7 +28,7 @@ func (this *Website) GetNewsItems() ([]*NewsItem, error) {
 	result := map[string]interface{}{}
 	err = json.Unmarshal(res.Body(), &result)
 	if err != nil {
-		verbose("Body unmarshalling error:\n%s", err.Error())
+		verbose("Body unmarshalling error:\n%s\nRequest url: %s\nBody: %v", err.Error(), url, res.String())
 		return newsItems, err
 	}
 
