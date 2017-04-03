@@ -3,6 +3,8 @@ package models
 import (
 	"encoding/json"
 
+	"github.com/astaxie/beego/orm"
+
 	"gopkg.in/resty.v0"
 )
 
@@ -48,4 +50,24 @@ func (this *Website) GetNewsItems() ([]*NewsItem, error) {
 	// no error yet
 	verbose("Returning %d items", len(newsItems))
 	return newsItems, nil
+}
+
+func (this *Website) Save() bool {
+	// check if item exists
+	existingWebsite := []orm.Params{}
+	o.Raw("SELECT * FROM website WHERE name = ? OR root_url = ?", this.Name, this.RootUrl).Values(&existingWebsite)
+	if existingWebsite != nil {
+		verbose("Website already exists in the database")
+		return false
+	}
+	i, err := o.Insert(this)
+	if err != nil {
+		verbose(err.Error())
+		return false
+	}
+	if i < 1 {
+		verbose("No rows saved")
+		return false
+	}
+	return true
 }
