@@ -12,6 +12,7 @@ func main() {
 	// start infinite loop to fetch news
 	for {
 		for _, site := range models.WEBSITES {
+			go site.Save()
 			items, err := site.GetNewsItems()
 			if err != nil {
 				log.Fatalln(err)
