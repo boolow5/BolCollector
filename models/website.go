@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"os"
 
 	"github.com/astaxie/beego/orm"
 
@@ -16,6 +17,10 @@ func (this *Website) GetNewsItems() ([]*NewsItem, error) {
 	if err != nil {
 		return newsItems, err
 	}
+	scraperUrl := os.Getenv("SCRAPER_URL")
+	if scraperUrl == "" {
+		scraperUrl = "http://localhost:8080"
+	}
 	// get the api url from the configurations
 	url := SETTINGS.NewsItemsUrl
 	// add time out to prevent some problems
@@ -23,7 +28,7 @@ func (this *Website) GetNewsItems() ([]*NewsItem, error) {
 	res, err := resty.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(requestBody).
-		Post(url)
+		Post(scraperUrl + url)
 
 	// parse json from the byte array
 	verbose("status: %v\nError: %v", res.StatusCode(), res.Error())

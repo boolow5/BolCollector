@@ -1,0 +1,1 @@
+{"delay":60, "news_items_url":"/fetch/list", "news_detail_url":"localhost:8080/fetch/detail", "database_file_name":"news.db"}

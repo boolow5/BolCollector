@@ -52,28 +52,35 @@ func init() {
 	DEBUG = false
 	AUTO_MIGRATE, _ = strconv.ParseBool(os.Getenv("MIGRATE"))
 	// load and open config files
-	config, err := ioutil.ReadFile("config/config.json")
+	config, err := ioutil.ReadFile("conf/config.json")
 	if err != nil {
-		panic(err)
+		fmt.Println("Error oppening config file\n", err)
 	}
 
 	// parse the config files
 	json.Unmarshal(config, &SETTINGS)
 	verbose("SETTINGS: %v", SETTINGS)
 
-	dir := "config"
+	dir := "conf"
 
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error reading websites config files\n", err)
 	}
 	for _, file := range files {
 		if strings.HasPrefix(file.Name(), "site") {
-			fileData, err := ioutil.ReadFile(dir + "/" + file.Name())
+			fullPath := dir + "/" + file.Name()
+			fileData, err := ioutil.ReadFile(fullPath)
+			if err != nil {
+				fmt.Printf("Error oppening %s config file\nError: %v\n", fullPath, err)
+			}
 			site := Website{}
 			err = json.Unmarshal(fileData, &site)
 			if err == nil {
 				WEBSITES = append(WEBSITES, &site)
+			}
+			if err != nil {
+				fmt.Printf("Error reading %s data\n", file.Name())
 			}
 		}
 	}
