@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/astaxie/beego/orm"
@@ -32,9 +34,10 @@ type (
 		TargetLink string `json:"target_link"`
 	}
 	Website struct {
-		Name     string    `json:"name"`
-		RootUrl  string    `json:"root_url"`
-		Selector *Selector `json:"selector"`
+		Id       int       `json:"id" orm:"auto"`
+		Name     string    `json:"name" orm:"unique"`
+		RootUrl  string    `json:"root_url" orm:"unique"`
+		Selector *Selector `json:"selector" orm:"-"`
 	}
 	NewsItem struct {
 		Id          int    `json:"id" orm:"auto"`
@@ -47,7 +50,7 @@ type (
 
 func init() {
 	DEBUG = false
-	AUTO_MIGRATE = false
+	AUTO_MIGRATE, _ = strconv.ParseBool(os.Getenv("MIGRATE"))
 	// load and open config files
 	config, err := ioutil.ReadFile("config/config.json")
 	if err != nil {
@@ -75,11 +78,18 @@ func init() {
 		}
 	}
 
+	dbHome := os.Getenv("DB_HOME")
+	if dbHome == "" {
+		dbHome = os.Getenv("HOME")
+	}
+
 	// database access
-	DatabaseFileName := SETTINGS.DatabaseFileName
-	orm.RegisterDriver("sqlite3", orm.DRSqlite)
-	orm.RegisterDataBase("default", "sqlite3", DatabaseFileName)
-	orm.RegisterModel(new(NewsItem))
+	if SETTINGS.DatabaseFileName != "" {
+		DatabaseFileName := SETTINGS.DatabaseFileName
+		orm.RegisterDriver("sqlite3", orm.DRSqlite)
+		orm.RegisterDataBase("default", "sqlite3", dbHome+"/"+DatabaseFileName)
+		orm.RegisterModel(new(NewsItem), new(Website))
+	}
 	o = orm.NewOrm()
 
 	// auto create database tables;
