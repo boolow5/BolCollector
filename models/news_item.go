@@ -25,3 +25,7 @@ func (this *NewsItem) Save() bool {
 	}
 	return true
 }
+
+func (this *NewsItem) TableName() string {
+	return "news_item"
+}
