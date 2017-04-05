@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/astaxie/beego/orm"
 	_ "github.com/mattn/go-sqlite3"
@@ -45,11 +46,14 @@ type (
 		Link        string `json:"link" orm:"unique"`
 		WebsiteName string `json:"website_name"`
 		WebsiteUrl  string `json:"website_url"`
+
+		CreatedAt time.Time `json:"created_at" orm:"auto_now_add;type(datetime)"`
+		UpdatedAt time.Time `json:"updated_at" orm:"auto_now;type(datetime)"`
 	}
 )
 
 func init() {
-	DEBUG = false
+	DEBUG, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	AUTO_MIGRATE, _ = strconv.ParseBool(os.Getenv("MIGRATE"))
 	// load and open config files
 	config, err := ioutil.ReadFile("conf/config.json")
@@ -119,6 +123,8 @@ func SaveNews(items []*NewsItem) {
 	skippedItems := 0
 	for _, item := range items {
 		verbose("Saving item %s", item.Link)
+		item.CreatedAt = time.Now()
+		item.UpdatedAt = time.Now()
 		if item.Save() {
 			savedItems += 1
 		} else {
